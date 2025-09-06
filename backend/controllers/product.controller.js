@@ -126,6 +126,31 @@ export const getProductsByCategory = async (req, res) => {
 	}
 };
 
+export const searchProducts = async (req, res) => {
+	try {
+		const { q } = req.query;
+		
+		if (!q || q.trim() === "") {
+			return res.json({ products: [] });
+		}
+
+		// Search in name, description, and category fields
+		const searchRegex = new RegExp(q.trim(), 'i');
+		const products = await Product.find({
+			$or: [
+				{ name: searchRegex },
+				{ description: searchRegex },
+				{ category: searchRegex }
+			]
+		});
+
+		res.json({ products });
+	} catch (error) {
+		console.log("Error in searchProducts controller", error.message);
+		res.status(500).json({ message: "Server error", error: error.message });
+	}
+};
+
 export const toggleFeaturedProduct = async (req, res) => {
 	try {
 		const product = await Product.findById(req.params.id);

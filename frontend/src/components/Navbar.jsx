@@ -1,5 +1,6 @@
-import { ShoppingCart, UserPlus, LogIn, LogOut, Lock } from "lucide-react";
-import { Link } from "react-router-dom";
+import { ShoppingCart, UserPlus, LogIn, LogOut, Lock, Search } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
 import { useUserStore } from "../stores/useUserStore";
 import { useCartStore } from "../stores/useCartStore";
 
@@ -7,6 +8,16 @@ const Navbar = () => {
 	const { user, logout } = useUserStore();
 	const isAdmin = user?.role === "admin";
 	const { cart } = useCartStore();
+	const navigate = useNavigate();
+	const [searchQuery, setSearchQuery] = useState("");
+
+	const handleSearch = (e) => {
+		e.preventDefault();
+		if (searchQuery.trim()) {
+			navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+			setSearchQuery("");
+		}
+	};
 
 	return (
 		<header className='fixed top-0 left-0 w-full bg-gray-900 bg-opacity-90 backdrop-blur-md shadow-lg z-40 transition-all duration-300 border-b border-emerald-800'>
@@ -24,6 +35,22 @@ const Navbar = () => {
 						>
 							Home
 						</Link>
+
+						{/* Search Bar */}
+						<form onSubmit={handleSearch} className='flex items-center'>
+							<div className='relative'>
+								<input
+									type='text'
+									placeholder='Search products...'
+									value={searchQuery}
+									onChange={(e) => setSearchQuery(e.target.value)}
+									className='bg-gray-800 text-white px-4 py-2 pl-10 pr-4 rounded-lg border border-gray-600 
+									focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 
+									transition duration-300 w-64 sm:w-48 md:w-64'
+								/>
+								<Search className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4' />
+							</div>
+						</form>
 						{user && (
 							<Link
 								to={"/cart"}
